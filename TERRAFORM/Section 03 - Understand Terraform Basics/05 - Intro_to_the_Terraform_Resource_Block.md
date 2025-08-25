@@ -27,33 +27,7 @@ When working with a specific provider, like AWS, Azure, or GCP, the resources ar
 - Task 4: Configure a resource from the random provider
 - Task 5: Update the Amazon S3 bucket to use the random ID
 
-## Task 1: View and understand an existing resource block in Terraform
-
-Using the main.tf created in previous labs, look for a resource block that deploys a route table. The code should look something like this:
-
-```hcl
-resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    gateway_id     = aws_internet_gateway.internet_gateway.id
-    #nat_gateway_id = aws_nat_gateway.nat_gateway.id
-  }
-  tags = {
-    Name      = "demo_public_rtb"
-    Terraform = "true"
-  }
-}
-```
-
-Let's look at the details in this resource block. First, all resource blocks will be declared using the resouce block type. Next, you'll find the type of resource that is going to be deployed. In this case, it's `aws_route_table` which is part of the AWS provider. Finally, we gave this resource a local name of `public_route_table`.
-
-> Note: Your resource blocks must have a unique resource id (combination of resource type along with resource name). In our example, our resource id is `aws_route_table.public_route_table`, which is the combination of our resource type `aws_route_table` and resource name `public_route_table`. This naming and interpolation nomenclature is powerful part of HCL that allows us to reference arguments from other resource blocks.
-
-Within our resouce block, we have arguments that are specific to the type of resource we are deploying. In our case, when we deploy a new AWS route table, there are certain arguments that are either `required` or `optional` that will apply to this resource. In our example, an AWS route table must be tied to a VPC, so we are providing the `vpc_id` argument and providing a value of our VPC using interpolation. Check out the `aws_route_table` documentation and see all the additional arguments that are available.
-
-## Task 2: Add a new resource to deploy an Amazon S3 bucket
+.## Task 1: Add a new resource to deploy an Amazon S3 bucket
 
 Ok, so now that we understand more about a resource block, let's create a new resource that will create an Amazon S3 bucket. In your main.tf file, add the following resource block:
 
@@ -75,7 +49,7 @@ resource "aws_s3_bucket_ownership_controls" "my_new_bucket_acl" {
 }
 ```
 
-### Task 2.1.1
+### Task 2
 
 Run a `terraform plan` to see that this new Amazon S3 bucket will be added to our account. Don't worry, S3 buckets don't incur any fees unless you upload data to the bucket.
 
@@ -137,11 +111,11 @@ Do you want to perform these actions?
 You will be prompted to confirm the changes before they're applied. Respond with
 `yes`.
 
-### Task 2.2.1
+### Task 3
 
 Log into your AWS account and validate that the new Amazon S3 bucket exists.
 
-## Task 3: Configure an AWS security group
+## Task 4: Configure an AWS security group
 
 Let's add one more resource block just to make sure you've got the hang of it. In this example, we're going to create a new Security Group that could be used for a web server to allow secure inbound connectivity over 443. If you are deploying EC2 instances or other resources in AWS, you'll probably need to define a custom security group.
 
@@ -170,7 +144,7 @@ resource "aws_security_group" "my-new-security-group" {
 
 Notice that this resource, the `aws_security_group` requires completely different arguments. We're providing a name, a description, a VPC, and most importantly, the rules that we want to permit or restrict traffic. We also providing tags that will be added to the resource.
 
-### Task 3.1.1
+### Task 4.1.1
 
 Run a `terraform plan` to see that this new Amazon security group will be added to our account. Don't worry, security groups don't incur any fees in AWS.
 
@@ -240,7 +214,7 @@ You will be prompted to confirm the changes before they're applied. Respond with
 
 Log into AWS, browse to the EC2 or VPC console and verify the newly created Security Group.
 
-## Task 4: Configure a resource from the random provider
+## Task 5: Configure a resource from the random provider
 
 Ok, one more resource. But this time, it's not an AWS resource. Terraform supports many resources that don't interact with any other services. In fact, there is a provider that you can use just to create random data to be used in your Terraform.
 
@@ -252,7 +226,7 @@ resource "random_id" "randomness" {
 }
 ```
 
-### Task 4.1.1
+### Task 5.1.1
 
 Run a `terraform plan` to see that this new Amazon security group will be added to our account. Don't worry, security groups in AWS don't incur any fees.
 
@@ -274,7 +248,7 @@ Error: Inconsistent dependency lock file
 
 Whoops....what happened? Well, we added a new resource that requires a provider that we haven't downloaded yet. Up until now, we've just been using the AWS provider, so adding AWS resources has worked fine. But now we need the hashicorp/random provider to use the `random_id` resource.
 
-### Task 4.1.2
+### Task 5.1.2
 
 Let's run a `terraform init` so Terraform will download the provider we need. Notice in the output of the `terraform init` that you will see Terraform download the `hashicorp/random` provider.
 
@@ -307,7 +281,7 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-### Task 4.1.3
+### Task 5.1.3
 
 Run a `terraform plan` again to see that this new Amazon S3 bucket will be added to our account. Don't worry, S3 buckets don't incur any fees unless you upload data to the bucket.
 
@@ -336,7 +310,7 @@ Terraform will perform the following actions:
 Plan: 1 to add, 0 to change, 0 to destroy.
 ```
 
-### Task 4.1.4
+### Task 5.1.4
 
 Run a `terraform apply -auto-approve` to create the new resource. Remember that we're not actually creating anything on AWS, but generating a random 16 byte id.
 
@@ -369,7 +343,7 @@ random_id.randomness: Creation complete after 0s [id=Htd2k6vC5PrbOxGeCBxAcQ]
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
 
-## Task 5: Update the Amazon S3 bucket to use the random ID
+## Task 6: Update the Amazon S3 bucket to use the random ID
 
 Now that we have a `random_id` being created by Terraform, let's see how we can use that for other resources. If you're not aware, Amazon S3 bucket names have to be globally unique, meaning nobody in the world can create a bucket with the same name as an existing bucket. That means if I create a bucket named "my-cool-s3-bucket", nobody else can create a bucket with the same name. This is where the random_id might come in handy, so let's update the name of our bucket to use a random ID.
 
@@ -386,7 +360,7 @@ resource "aws_s3_bucket" "my-new-S3-bucket" {
 }
 ```
 
-### Task 5.1.1
+### Task 6.1.1
 
 Run a `terraform plan` again to see that Terraform is going to replace our Amazon S3 bucket in our account because the name is changing. The name will now end with our random id that we created using the `random_id` resource.
 
@@ -432,7 +406,7 @@ Terraform will perform the following actions:
 Plan: 1 to add, 0 to change, 1 to destroy.
 ```
 
-### Task 5.1.2
+### Task 6.1.2
 
 Now that we're done with going over the Resource block, feel free to delete the resources that we created in this lab. These resources include:
 
