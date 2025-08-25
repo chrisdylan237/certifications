@@ -21,13 +21,12 @@ When working with a specific provider, like AWS, Azure, or GCP, the resources ar
 
 **Important** - Without `resource` blocks, Terraform is not going to create resources. All of the other block types, such as `variable`, `provider`, `terraform`, `output`, etc. are essentially supporting block types for the `resource` block.
 
-- Task 1: View and understand an existing resource block in Terraform
-- Task 2: Add a new resource to deploy an Amazon S3 bucket
-- Task 3: Create a new AWS security group
-- Task 4: Configure a resource from the random provider
-- Task 5: Update the Amazon S3 bucket to use the random ID
+- Task 1: Add a new resource to deploy an Amazon S3 bucket and EC2 Instance
+- Task 2: Create a new AWS security group
+- Task 3: Configure a resource from the random provider
+- Task 4: Update the Amazon S3 bucket to use the random ID
 
-.## Task 1: Add a new resource to deploy an Amazon S3 bucket
+### Task 1: Add a new resource to deploy an Amazon S3 bucket
 
 Ok, so now that we understand more about a resource block, let's create a new resource that will create an Amazon S3 bucket. In your main.tf file, add the following resource block:
 
